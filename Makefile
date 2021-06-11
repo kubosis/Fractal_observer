@@ -1,4 +1,4 @@
-CFLAGS = -Wall -std=gnu99 -O0
+CFLAGS = -Wall -std=gnu99 -O3
 LDFLAGS=  -lpthread  -lm -Wl,--no-as-needed -L/usr/lib/x86_64-linux-gnu -Wl,--no-as-needed -lSDL2 -Wl,--no-as-needed -lSDL2_image
 
 CFLAGS+=$(shell sdl2-config --cflags)
@@ -22,6 +22,6 @@ ${OBJS}: %.o: %.c
 	gcc -c ${CFLAGS} $< -o $@
 
 clean:
-	rm  ${BINARIES} 
-	rm *.o
-	rm */*.o
+	rm -f  ${BINARIES} 
+	rm -f *.o
+	rm -f */*.o

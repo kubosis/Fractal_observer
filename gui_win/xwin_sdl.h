@@ -12,7 +12,7 @@
 #include <SDL2/SDL_image.h>
 
 #include <SDL2/SDL.h>
-
+#define BUTTON_WIN_W 90
 
 int xwin_init(int w, int h);
 void xwin_close();

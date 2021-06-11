@@ -93,7 +93,7 @@ void gui_resize_win(int w, int h, bool drawn)
 {
     fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET  " Window is being resized to %d x %d\n", w, h);
     xwin_poll_events();
-    gui.w = w;
+    gui.w = w - BUTTON_WIN_W;
     gui.h = h;
     comp_grid_resize(gui.w, gui.h);
     if (!drawn) {

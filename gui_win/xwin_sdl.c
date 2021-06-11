@@ -10,6 +10,7 @@
 #include "xwin_sdl.h"
 #include "../utils/utils.h"
 #include "icon.h"
+#include "gui_buttons.h"
 
 static SDL_Window *win = NULL;
 
@@ -18,7 +19,7 @@ int xwin_init(int w, int h)
       int r;
       r = SDL_Init(SDL_INIT_VIDEO);
       assert(win == NULL);
-      win = SDL_CreateWindow("PRG Semester Project", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h,  SDL_WINDOW_RESIZABLE);
+      win = SDL_CreateWindow("PRG Semester Project", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w + BUTTON_WIN_W, h,  SDL_WINDOW_RESIZABLE);
       assert(win != NULL);
       SDL_SetWindowTitle(win, "FRACTAL OBSERVER");
       SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(icon, 64, 48, 24, 64 * 3, 0xff, 0xff00, 0xff0000, 0x0000);
@@ -37,11 +38,10 @@ void xwin_close()
 
 void xwin_redraw(int w, int h, unsigned char *img)
 {
-   assert(img && win);
    SDL_Surface *scr = SDL_GetWindowSurface(win);
    for(int y = 0; y < scr->h; ++y) {
-      for(int x = 0; x < scr->w; ++x) {
-         const int idx = (y * scr->w + x) * scr->format->BytesPerPixel;
+      for(int x = 0; x < scr->w - BUTTON_WIN_W; ++x) {
+         const int idx = (y * (scr->w) + x) * scr->format->BytesPerPixel;
          Uint8 *px = (Uint8*)scr->pixels + idx;
          *(px + scr->format->Rshift / 8) = *(img++);
          *(px + scr->format->Gshift / 8) = *(img++);
@@ -59,7 +59,7 @@ void xwin_poll_events(void)
 
 void xwin_resize(int width, int height) 
 {
-   SDL_SetWindowSize(win, width, height);
+   SDL_SetWindowSize(win, width + BUTTON_WIN_W, height);
 }
 
 void save_image(char *scr_name)
