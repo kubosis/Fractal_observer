@@ -16,6 +16,7 @@ typedef enum {
    EV_COMPUTING,
    EV_MOUSE,
    EV_WINDOW,
+   EV_BUTTON,
    EV_NUM
 } event_source;
 

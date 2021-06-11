@@ -7,12 +7,18 @@
 #ifndef __XWIN_SDL_H__
 #define __XWIN_SDL_H__
 
-
-
 #include <SDL2/SDL_image.h>
 
 #include <SDL2/SDL.h>
-#define BUTTON_WIN_W 90
+#define BUTTON_WIN_W 145
+
+enum {
+    REDRAW_ANIM,
+    REDRAW_C_IM_P,
+    REDRAW_C_IM_M,
+    REDRAW_C_RE_P,
+    REDRAW_C_RE_M
+} ;
 
 int xwin_init(int w, int h);
 void xwin_close();
@@ -20,6 +26,7 @@ void xwin_redraw(int w, int h, unsigned char *img);
 void xwin_poll_events(void);
 void xwin_resize(int width, int height);
 void save_image(char *scr_name);
+void xwin_redraw_button(int button, bool anim, bool anim_change);
 
 #endif
 

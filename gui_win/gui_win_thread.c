@@ -32,6 +32,7 @@ void *gui_win_thread(void *v)
     bool resize = false;
     bool animate = false;
     SDL_Event sdl_ev;
+    int x,y;
 
     while (!end) {
         ev.source = EV_KEYBOARD;
@@ -64,6 +65,17 @@ void *gui_win_thread(void *v)
                         ev.data.rsz.size_h = sdl_ev.window.data2;
                         usleep(1000);
                     } 
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    SDL_GetMouseState(&x, &y);
+                    printf("%d %d %d\n",x,y, get_x_max());
+                    int x_max = get_x_max();
+                    if (x >= x_max + 15 && x <= x_max + 150) {
+                        ev.source = EV_BUTTON;
+                        if (y >= 15 && y <= 75) {
+                            ev.type = EV_ANIMATE;
+                        }
+                    }
                     break;
                 case EV_SAVE_BLANK:
                     blank_im = true;

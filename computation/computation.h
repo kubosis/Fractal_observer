@@ -76,5 +76,7 @@ void move_right_left(bool right, bool drawn);
 
 void set_params(int param, void *val1, void *val2); // without param we don't know if vals are range or c
 
+int get_x_max();
+
 
 #endif

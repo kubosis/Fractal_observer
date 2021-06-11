@@ -25,14 +25,14 @@
 #define DECREASE false
 
 int baud_level = RATE_NORMAL;
-
+bool animate;
 bool abort_req = false; // abort requested
 bool comp_set = false;
 
 bool handle_keyboard(event *ev, message *msg, bool *drawn, data_t *data)
 {
     bool quit = false;
-    bool animate;
+    
     bool save_blank = false;
     time_t current_time;
     msg->type = MSG_NBR;
@@ -324,4 +324,24 @@ void handle_mouse(event *ev, data_t *data, bool drawn)
 void handle_window(event *ev, data_t *data, bool drawn)
 {
     gui_resize_win(ev->data.rsz.size_w, ev->data.rsz.size_h, drawn);
+}
+
+void handle_button(event *ev, data_t *data, bool *drawn)
+{
+    switch (ev->type) {
+        case EV_ANIMATE:
+            // turn on / off animation
+            animate = data->animate = !data->animate;
+            xwin_redraw_button(REDRAW_ANIM, animate, true);
+            *drawn = true;
+            if (animate) {
+                info("Animation has started");
+            } else {
+                info("Animation has ended");
+            }
+            break;
+        default:
+            // no other button events to handle
+            break;
+    }
 }

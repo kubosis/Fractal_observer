@@ -158,6 +158,9 @@ int main(int argc, char *argv[])
             case EV_WINDOW:
                 handle_window(&ev, &data, drawn);
                 break;
+            case EV_BUTTON:
+                handle_button(&ev, &data, &drawn);
+                break;
             default:
                 // no other event types exist - just for sure
                 break;

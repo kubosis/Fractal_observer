@@ -446,3 +446,8 @@ void set_params(int param, void *val1, void *val2)
         fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " %s set succesfully\n", c);
     }
 }
+
+int get_x_max()
+{
+    return comp.grid_w;
+}

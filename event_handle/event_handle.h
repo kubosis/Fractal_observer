@@ -28,4 +28,7 @@ void handle_mouse(event *ev, data_t *data, bool drawn);
 /* resized window events */
 void handle_window(event *ev, data_t *data, bool drawn);
 
+/* handle gui buttons */
+void handle_button(event *ev, data_t *data, bool *drawn);
+
 #endif
