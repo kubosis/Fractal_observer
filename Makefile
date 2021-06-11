@@ -17,16 +17,17 @@ TARGET_EXE = Fractal-observer
 
 
 
-all: $(TARGET_EXE)
 
-$(TARGET_EXE): ${SOURCES}
-	gcc ${SOURCES} ${LDFLAGS} -o $@
+OBJS=${patsubst %.c,%.o,${SOURCES}}
 
-${SOURCES}: %.o: %.c
+TARGET_EXE: ${OBJS}
+	gcc ${OBJS} ${LDFLAGS} -o $@
+
+${OBJS}: %.o: %.c
 	gcc -c ${CFLAGS} $< -o $@
 
 clean:
 	rm -f ${TARGET_EXE} 
-
+	rm *.o
 	rm */*.o
 	rm -f ${HW}-brute.zip
