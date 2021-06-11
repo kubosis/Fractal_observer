@@ -13,21 +13,15 @@ SOURCES += gui_win/gui_win_thread.c gui_win/gui.c gui_win/guithreads.c gui_win/x
 SOURCES += event_handle/event_handle.c event_handle/event_queue.c computation/computation.c
 
 
-TARGET_EXE = Fractal-observer
-
-
-
-
 OBJS=${patsubst %.c,%.o,${SOURCES}}
 
-TARGET_EXE: ${OBJS}
+ Fractal-observer: ${OBJS}
 	gcc ${OBJS} ${LDFLAGS} -o $@
 
 ${OBJS}: %.o: %.c
 	gcc -c ${CFLAGS} $< -o $@
 
 clean:
-	rm -f ${TARGET_EXE} 
+	rm  ${BINARIES} 
 	rm *.o
 	rm */*.o
-	rm -f ${HW}-brute.zip
