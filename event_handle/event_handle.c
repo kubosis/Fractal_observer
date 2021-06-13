@@ -340,6 +340,13 @@ void handle_button(event *ev, data_t *data, bool *drawn)
                 info("Animation has ended");
             }
             break;
+        case EV_PLUS_COMPLEX:
+            xwin_redraw_button(ev->data.cb.button, animate, false);
+            change_complex(INCREASE, ev->data.cb.real, drawn);
+            break;
+        case EV_MINUS_COMPLEX:
+            xwin_redraw_button(ev->data.cb.button, animate, false);
+            change_complex(DECREASE, ev->data.cb.real, drawn);
         default:
             // no other button events to handle
             break;

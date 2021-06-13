@@ -10,7 +10,7 @@
 #include <SDL2/SDL_image.h>
 
 #include <SDL2/SDL.h>
-#define BUTTON_WIN_W 145
+#define BUTTON_WIN_W 120
 
 enum {
     REDRAW_ANIM,

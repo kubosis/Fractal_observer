@@ -52,6 +52,11 @@ typedef struct {
 } event_keyboard;
 
 typedef struct {
+   int button;
+   bool real;
+} complex_butt;
+
+typedef struct {
    message *msg;
 } event_serial;
 
@@ -67,6 +72,7 @@ typedef struct {
       int param;
       message *msg;
       resize rsz;
+      complex_butt cb;
    } data;
 } event;
 

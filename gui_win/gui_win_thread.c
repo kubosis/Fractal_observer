@@ -8,6 +8,7 @@
 #include "../utils/utils.h"
 #include "gui.h"
 #include "../computation/computation.h"
+#include "xwin_sdl.h"
 
 #define SDL_DELAY_MS 10
 
@@ -68,12 +69,27 @@ void *gui_win_thread(void *v)
                     break;
                 case SDL_MOUSEBUTTONDOWN:
                     SDL_GetMouseState(&x, &y);
-                    printf("%d %d %d\n",x,y, get_x_max());
                     int x_max = get_x_max();
-                    if (x >= x_max + 15 && x <= x_max + 150) {
+                    if (x >= x_max + 7 && x <= x_max + 105) {
                         ev.source = EV_BUTTON;
-                        if (y >= 15 && y <= 75) {
+                        if (y >= 10 && y <= 51) {
                             ev.type = EV_ANIMATE;
+                        } else if (y >= 64 && y <= 105) {
+                            ev.type = EV_PLUS_COMPLEX;
+                            ev.data.cb.real = false;
+                            ev.data.cb.button = REDRAW_C_IM_P;
+                        } else if (y >= 118 && y <= 161) {
+                            ev.type = EV_MINUS_COMPLEX;
+                            ev.data.cb.real = false;
+                            ev.data.cb.button = REDRAW_C_IM_M;
+                        } else if (y >= 174 && y <= 216) {
+                            ev.type = EV_PLUS_COMPLEX;
+                            ev.data.cb.real = true;
+                            ev.data.cb.button = REDRAW_C_RE_P;
+                        } else if (y >= 229 && y <= 271) {
+                            ev.type = EV_MINUS_COMPLEX;
+                            ev.data.cb.real = true;
+                            ev.data.cb.button = REDRAW_C_RE_M;
                         }
                     }
                     break;
