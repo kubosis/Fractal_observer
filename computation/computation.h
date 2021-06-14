@@ -42,6 +42,15 @@ enum {
     FRACTAL_NUM
 };
 
+typedef struct {
+    uint8_t *grid;
+    int w;
+    int h;
+    bool done;
+} grid_t;
+
+grid_t barn_grid;
+
 void computation_init();
 
 void computation_cleanup();

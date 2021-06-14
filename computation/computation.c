@@ -85,11 +85,19 @@ static struct {
 
 void computation_init()
 {
-    set_fractal(JULIA_2);
+    set_fractal(JULIA_2, NULL);
     presets_init();
     fr = JULIAN_AND_MANDELBROT;
+    chaos_preset = TRIANGLE;
+    chaos_col = COLORS;
+    set_chaos_preset(chaos_preset, chaos_col);
     
     comp.grid = allocate_mem(comp.grid_w * comp.grid_h);
+    barn_grid.grid = allocate_mem(comp.grid_w * comp.grid_h);
+
+    barn_grid.w = comp.grid_w;
+    barn_grid.h = comp.grid_h;
+    barn_grid.done = false;
 
     comp.d_re = (comp.range_re_max - comp.range_re_min) / (1. * comp.grid_w);
     comp.d_im = -(comp.range_im_max - comp.range_im_min) / (1. * comp.grid_h);
@@ -221,7 +229,7 @@ void update_image(int w, int h, uint8_t *img)
 {
     int img_idx = 0;
     int R,G,B;
-    int color[7][3] = {{255,0,0}, {0,255,0}, {0,0,255}, {255,255,0}, {255,0,255}, {0,255,255},  {0,125,255}};
+    int color[][3] = {{255,0,0},  {0,255,0}, {0,0,255}, {255,255,0}, {255,0,255}, {0,255,255}};
     // all basic colors with their complement
     switch (fr) {
         case JULIAN_AND_MANDELBROT:
@@ -239,22 +247,22 @@ void update_image(int w, int h, uint8_t *img)
             break;
         case BARNSLEY:
             for (int i = 0; i < w * h; ++i) {
-                img[img_idx++] = 0;
-                img[img_idx++] = comp.grid[i] == 255? 255 : 0;
-                img[img_idx++] = 0;
+                img[img_idx++] = comp.grid[i] == 255? 0 : 255;
+                img[img_idx++] = 255;
+                img[img_idx++] = comp.grid[i] == 255? 0 : 255;
             }
             break;
         case CHAOS:
             for (int i = 0; i < w * h; ++i) {
                 if (comp.grid[i] == 0) {
-                    img[img_idx++] = 0;
-                    img[img_idx++] = 0;
-                    img[img_idx++] = 0;
+                    img[img_idx++] = 255;
+                    img[img_idx++] = 255;
+                    img[img_idx++] = 255;
                 } else {
                     if (fr_data.ch_d.colors == COLORS) {
-                        R = color[comp.grid[i-1]][0];
-                        G = color[comp.grid[i-1]][1];
-                        B = color[comp.grid[i-1]][2];
+                        R = color[comp.grid[i]][0];
+                        G = color[comp.grid[i]][1];
+                        B = color[comp.grid[i]][2];
                     } else if (fr_data.ch_d.colors == CYAN) {
                         R = 0;
                         G = 255;
@@ -288,9 +296,10 @@ void comp_ended()
 
 void comp_grid_resize(int w, int h)
 {
-    comp.grid_h = h;
-    comp.grid_w = w;
+    barn_grid.h = comp.grid_h = h;
+    barn_grid.w = comp.grid_w = w;
     free(comp.grid);
+    free(barn_grid.grid);
     computation_init();
 }
 
@@ -313,54 +322,8 @@ bool cpu_comp()
 
 bool comp_barnsley()
 {
-
-    double x0=0,y0=0,x1,y1;
-    int diceThrow;
-    time_t t;
-    srand((unsigned)time(&t));
-
-    for (int i = 0; i < comp.grid_w * comp.grid_h; i++) {
-        comp.grid[i] = 0;
-    }
-
-    for (int i = 0; i < 500000000; ++i) {
-        diceThrow = rand()%100;
-
-        if(diceThrow==0) {
-            x1 = 0;
-            y1 = 0.16*y0;
-        }
-
-        else if(diceThrow>=1 && diceThrow<=7) {
-            x1 = 0.85*x0 +0.04*y0;
-            y1 = -0.04*x0 + 0.85 *y0 + 1.6;
-        }
-
-        else if(diceThrow>=8 && diceThrow<=15) {
-            x1 = 0.2*x0 - 0.26*y0;
-            y1 = 0.23*x0 + 0.22*y0 + 1.6;
-        }
-
-        else {
-            x1 = -0.15*x0 + 0.28*y0;
-            y1 = 0.26*x0 + 0.24*y0+0.44;
-        }
-
-
-        int grid_x = (int)(x1 / 4 * comp.grid_w + comp.grid_w / 2);
-        int grid_y = (int)(comp.grid_h - y1 / 10 * comp.grid_h) * comp.grid_w;
-        comp.grid[grid_x + grid_y] = 255;
-
-        x0 = x1;
-        y0 = y1;
-
-        if (i%250000 == 0) {
-            fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Barnsleyfern is being calculated - progress = %d%%\r", i*100/500000000);
-            gui_refresh();
-        }
-
-    }
-    fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Barnsleyfern is being calculated - progress = %d%%\r\n", 100);
+    comp.grid = barn_grid.grid;
+    gui_refresh();
     return true;
 }
 
@@ -372,7 +335,7 @@ bool comp_chaos(void)
  
 	side = comp.grid_w / fr_data.ch_d.ratio;
  
-	iter = 1000000;
+	iter = 200000000;
 
     for (int i = 0; i < comp.grid_w * comp.grid_h; i++) {
         comp.grid[i] = 0;
@@ -388,7 +351,9 @@ bool comp_chaos(void)
 	seedX = 0;
 	seedY = 0;
 
-    int color[] = {1,2,3,4,5,6,7};
+    int color[] = {0,1,2,3,4,5};
+    int col_shift = rand() % 6;
+    int col_ind = 1;
  
 	for(i=0;i<iter;i++){
 		choice = rand()%fr_data.ch_d.verticles;
@@ -396,9 +361,15 @@ bool comp_chaos(void)
 		seedX = (seedX + vertices[choice][0])/fr_data.ch_d.mod + comp.grid_w*fr_data.ch_d.shift;
 		seedY = (seedY + vertices[choice][1])/fr_data.ch_d.mod + comp.grid_h*fr_data.ch_d.shift;
 
- 
-		comp.grid[(int)(seedX +  comp.grid_w * seedY)] = color[choice];
+        col_ind = (choice) % 6;
+		comp.grid[(int)(seedX +  comp.grid_w * seedY)] = color[col_ind];
+        if (i%5000000 == 0) {
+            col_shift += 1;
+            fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Sierpenski chaos is being calculated - progress = %d%%\r", i*100/200000000);
+            gui_refresh();
+        }
 	}
+    fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Sierpenski chaos being calculated - progress = %d%%\r\n", 100);
     return true;
 }
 

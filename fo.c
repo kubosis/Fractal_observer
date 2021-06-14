@@ -30,7 +30,7 @@
 int main(int argc, char *argv[])
 {
     // initialize shared data
-    data_t data = { .quit = false, .fd = -1, .animate = false, .ser_name = NULL, .baud_change = false };
+    data_t data = { .quit = false, .fd = -1, .animate = false, .ser_name = NULL, .baud_change = false, .barn = false };
     pthread_mutex_init(&mtx, NULL);
     
     // no arguments --> open serial on predefined location
@@ -97,11 +97,14 @@ int main(int argc, char *argv[])
     // set terminal to raw mode
     set_raw(TERMINAL_RAW);
 
-    // initialize threads
-    const char *thread_names[] = {  "Serial comm thread", "Animation thread", "GUI window thread" }; // (can be added)"Input Thread"
-    enum { SERIAL_COM, ANIMATION, GUI_WIN, NUM_THREADS }; // (can be added)INPUT
+    computation_init();
+    info("Computation initialized");
 
-    void* (*thr_fuction[])(void *) = {  serial_thread, animation_thread, gui_win_thread }; // (can be added)in_thread
+    // initialize threads
+    const char *thread_names[] = {  "Serial comm thread", "Animation thread", "GUI window thread", "Barnsley fern thread" }; // (can be added)"Input Thread"
+    enum { SERIAL_COM, ANIMATION, GUI_WIN, BARNSLEY_FERN, NUM_THREADS }; // (can be added)INPUT
+
+    void* (*thr_fuction[])(void *) = {  serial_thread, animation_thread, gui_win_thread, barnsley_fern_thread }; // (can be added)in_thread
     pthread_mutex_init(&mtx, NULL);
 
     pthread_t threads[NUM_THREADS];
@@ -116,8 +119,6 @@ int main(int argc, char *argv[])
 
     help("Press 'h' to see help");
     help("or run with '--help' to see all options");
-    computation_init();
-    info("Computation initialized");
     gui_init();
     clear_image();
     gui_refresh();  // so that it isnt redrawn by other apps

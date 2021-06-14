@@ -45,6 +45,8 @@ typedef enum {
    EV_SAVE_BLANK,
    EV_CHANGE_BAUD,
    EV_CHANGE_FRACTAL,
+   EV_CHAOS_TYPE,
+   EV_CHAOS_COL,
    EV_TYPE_NUM,
 } event_type;
 

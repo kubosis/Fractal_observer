@@ -4,6 +4,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "../io_handle/iothreads.h"
+
+typedef enum {
+    TRIANGLE,
+    PENTAGON,
+    HEPTAGON,
+    OKTAGON,
+    CHAOS_TYPE_NUM
+} chaos_presets;
+
 typedef enum {
     JULIAN_AND_MANDELBROT,
     BARNSLEY,
@@ -14,7 +24,8 @@ typedef enum {
 typedef enum {
     CYAN,
     RANDOM,
-    COLORS
+    COLORS,
+    COLOR_NUM
 } coloring_t;
 
 typedef struct {
@@ -33,8 +44,9 @@ typedef struct {
     };
 } fractal_data_t;
 
-void set_fractal(int num);
+void set_fractal(int num, data_t *data);
 void presets_init();
+void set_chaos_preset(chaos_presets preset, coloring_t color);
 
 uint16_t fractal_julia_2(double re, double im, int n, double c_re, double c_im);
 uint16_t fractal_julia_3(double re, double im, int n, double c_re, double c_im);
@@ -52,5 +64,7 @@ uint16_t multibrot_7(double re, double im, int n, double c_re, double c_im);
 fractal_t fr;
 
 fractal_data_t fr_data;
+chaos_presets chaos_preset;
+coloring_t chaos_col;
 
 #endif

@@ -21,7 +21,7 @@ void presets_init()
     pentagon_preset.verticles = 5;
     pentagon_preset.mod = 2.75;
     pentagon_preset.ratio = 1.8;
-    pentagon_preset.shift = 0.12;
+    pentagon_preset.shift = 0.14;
 
     heptagon_preset.verticles = 7;
     heptagon_preset.mod = 3.2;
@@ -33,12 +33,48 @@ void presets_init()
     oktagon_preset.ratio = 1.25;
     oktagon_preset.shift = 0.23;
 }
+
+void set_chaos_preset(chaos_presets preset, coloring_t color)
+{
+    switch (preset) {
+        case TRIANGLE:
+            fr_data.ch_d = triangle_preset;
+            break;
+        case PENTAGON:
+            fr_data.ch_d = pentagon_preset;
+            break;
+        case HEPTAGON:
+            fr_data.ch_d = heptagon_preset;
+            break;
+        case OKTAGON:
+            fr_data.ch_d = oktagon_preset;
+            break;
+        default:
+            break;
+    }
+    switch (color) {
+        case COLORS:
+            fr_data.ch_d.colors = COLORS;
+            break;
+        case RANDOM:
+            fr_data.ch_d.colors = RANDOM;
+            break;
+        case CYAN:
+            fr_data.ch_d.colors = CYAN;
+            break;
+        default:
+            break;
+    }
+}
 /* end of chaos presets */
 
-void set_fractal(int num)
+void set_fractal(int num, data_t *data)
 {
     switch (num) {
         case JULIA_2:
+            if (data) {
+                data->barn = false;
+            }
             fr = JULIAN_AND_MANDELBROT;
             cpu_compute = cpu_comp;
             fractal = fractal_julia_2;
@@ -77,12 +113,13 @@ void set_fractal(int num)
             fractal = multibrot_7;
             break;
         case BARSNLEY_FERN:
+            data->barn = true;
             cpu_compute = comp_barnsley;
             fr = BARNSLEY;
             break;
         case CHAOS_GAME:
-            fr_data.ch_d = oktagon_preset;
-            fr_data.ch_d.colors = CYAN;
+            
+            fr_data.ch_d.colors = COLORS;
             fr = CHAOS;
             cpu_compute = comp_chaos;
             break;

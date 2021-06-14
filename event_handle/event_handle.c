@@ -121,7 +121,7 @@ bool handle_keyboard(event *ev, message *msg, bool *drawn, data_t *data)
         case EV_CHANGE_FRACTAL:
             fractal_type += 1;
             fractal_type %= FRACTAL_NUM;
-            set_fractal(fractal_type);
+            set_fractal(fractal_type, data);
             fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Fractal set to %s\n", fractal_names[fractal_type]);
             cpu_compute();
             gui_refresh();
@@ -198,6 +198,19 @@ bool handle_keyboard(event *ev, message *msg, bool *drawn, data_t *data)
             } else {
                 info("Animation has ended");
             }
+            break;
+        case EV_CHAOS_TYPE:
+            chaos_preset += 1;
+            chaos_preset %= CHAOS_TYPE_NUM;
+            set_chaos_preset(chaos_preset, chaos_col);
+            cpu_compute();
+            gui_refresh();
+            break;
+        case EV_CHAOS_COL:
+            chaos_col += 1;
+            chaos_col %= COLOR_NUM;
+            set_chaos_preset(chaos_preset, chaos_col);
+            gui_refresh();
             break;
         default:
             // nothing to do with other events

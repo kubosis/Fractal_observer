@@ -30,6 +30,7 @@ typedef struct {
     bool animate;
     const char *ser_name;
     bool baud_change;
+    bool barn;
 } data_t;
 
 pthread_mutex_t mtx;

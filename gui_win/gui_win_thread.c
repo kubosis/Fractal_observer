@@ -114,6 +114,8 @@ void *gui_win_thread(void *v)
     return NULL;
 }
 
+SDL_Keycode last_key;
+
 bool gui_keyboard_ev(SDL_Event *sdl_ev, event *ev, bool *resize, bool *animate, data_t *data)
 {
     bool end = false;
@@ -164,7 +166,14 @@ bool gui_keyboard_ev(SDL_Event *sdl_ev, event *ev, bool *resize, bool *animate, 
                 ev->type = EV_ANIMATE;
                 break;
             case SDLK_x:
-                ev->type = EV_CHANGE_FRACTAL;
+                if (last_key != SDLK_LALT && last_key != SDLK_LCTRL) {
+                    ev->type = EV_CHANGE_FRACTAL;
+                } else if (last_key == SDLK_LALT) {
+                    ev->type = EV_CHAOS_TYPE;
+                } else {
+                    // last key == left ctrl
+                    ev->type = EV_CHAOS_COL;
+                }
                 break;
             case SDLK_o:
                 change_menu = true;
@@ -283,6 +292,7 @@ bool gui_keyboard_ev(SDL_Event *sdl_ev, event *ev, bool *resize, bool *animate, 
             }
         }
     }
+    last_key = sdl_ev->key.keysym.sym;
     return end;
 }
 

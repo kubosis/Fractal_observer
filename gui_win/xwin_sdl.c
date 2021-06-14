@@ -57,9 +57,9 @@ void xwin_redraw(int w, int h, unsigned char *img)
       for(int x = 0; x < scr->w - BUTTON_WIN_W; ++x) {
          const int idx = (y * (scr->w) + x) * scr->format->BytesPerPixel;
          Uint8 *px = (Uint8*)scr->pixels + idx;
-         *(px + scr->format->Rshift / 8) = *(img++);
-         *(px + scr->format->Gshift / 8) = *(img++);
-         *(px + scr->format->Bshift / 8) = *(img++);
+         *(px + scr->format->Rshift/8) = *(img++);
+         *(px + scr->format->Gshift/8) = *(img++);
+         *(px + scr->format->Bshift/8) = *(img++);
       }
    }
    int i = 0;

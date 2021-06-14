@@ -15,5 +15,8 @@
 /* animate until not stopped */
 void *animation_thread(void *v);
 
+/* compute barnsley fern */
+void *barnsley_fern_thread(void* v);
+
 
 #endif
