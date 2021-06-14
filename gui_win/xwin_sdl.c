@@ -11,11 +11,11 @@
 #include "xwin_sdl.h"
 #include "../utils/utils.h"
 #include "icon.h"
-#include "button_anim.h"
-#include "button_c_im_pp.h"
-#include "button_c_im_mm.h"
-#include "button_c_re_pp.h"
-#include "button_c_re_mm.h"
+#include "textures/button_anim.h"
+#include "textures/button_c_im_pp.h"
+#include "textures/button_c_im_mm.h"
+#include "textures/button_c_re_pp.h"
+#include "textures/button_c_re_mm.h"
 
 static SDL_Window *win = NULL;
 
