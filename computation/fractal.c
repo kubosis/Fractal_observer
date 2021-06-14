@@ -75,7 +75,7 @@ void set_fractal(int num, data_t *data)
             if (data) {
                 data->barn = false;
             }
-            fr = JULIAN_AND_MANDELBROT;
+            fr = JULIA;
             cpu_compute = cpu_comp;
             fractal = fractal_julia_2;
             break;
@@ -95,6 +95,7 @@ void set_fractal(int num, data_t *data)
             fractal = fractal_julia_7;
             break;
         case MANDELBROT:
+            fr = MANDELBROT_FR;
             fractal = mandelbrot;
             break;
         case MULTIBROT_3:

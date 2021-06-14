@@ -87,7 +87,7 @@ void computation_init()
 {
     set_fractal(JULIA_2, NULL);
     presets_init();
-    fr = JULIAN_AND_MANDELBROT;
+    fr = JULIA;
     chaos_preset = TRIANGLE;
     chaos_col = COLORS;
     set_chaos_preset(chaos_preset, chaos_col);
@@ -229,10 +229,23 @@ void update_image(int w, int h, uint8_t *img)
 {
     int img_idx = 0;
     int R,G,B;
-    int color[][3] = {{255,0,0},  {0,255,0}, {0,0,255}, {255,255,0}, {255,0,255}, {0,255,255}};
+    int color[][3] = {{255,0,0},  {0,255,0}, {0,0,255}, {255,255,0}, {255,0,255}, {0,255,255}, {255,0,0}, {0,191,255}, {255,81,125}};
     // all basic colors with their complement
     switch (fr) {
-        case JULIAN_AND_MANDELBROT:
+        case JULIA:
+            for (int i = 0; i < w * h; ++i) {
+                int R, G, B;
+                const double t = 1. * comp.grid[i] / (comp.n);
+                R = 8.5 * (1-t)*t*t*t * 255;
+                G = 14 * (1-t)*(1-t)*t * t * 255;
+                B = 9 * (1-t)*(1-t)*(1-t) * t * 255;
+                img[img_idx++] = R <= 255 ? (R >= 0 ? R : 0) : 255;
+                img[img_idx++] = G <= 255 ? (G >= 0 ? G : 0) : 255;
+                img[img_idx++] = B <= 255 ? (B >= 0 ? B : 0) : 255;
+
+            }
+            break;
+        case MANDELBROT_FR:
             for (int i = 0; i < w * h; ++i) {
                 int R, G, B;
                 const double t = 1. * comp.grid[i] / (comp.n);
@@ -247,17 +260,17 @@ void update_image(int w, int h, uint8_t *img)
             break;
         case BARNSLEY:
             for (int i = 0; i < w * h; ++i) {
-                img[img_idx++] = comp.grid[i] == 255? 0 : 255;
-                img[img_idx++] = 255;
-                img[img_idx++] = comp.grid[i] == 255? 0 : 255;
+                img[img_idx++] = 0;
+                img[img_idx++] = comp.grid[i] == 255? 255 : 0;
+                img[img_idx++] = 0;
             }
             break;
         case CHAOS:
             for (int i = 0; i < w * h; ++i) {
                 if (comp.grid[i] == 0) {
-                    img[img_idx++] = 255;
-                    img[img_idx++] = 255;
-                    img[img_idx++] = 255;
+                    img[img_idx++] = 0;
+                    img[img_idx++] = 0;
+                    img[img_idx++] = 0;
                 } else {
                     if (fr_data.ch_d.colors == COLORS) {
                         R = color[comp.grid[i]][0];
@@ -335,7 +348,7 @@ bool comp_chaos(void)
  
 	side = comp.grid_w / fr_data.ch_d.ratio;
  
-	iter = 200000000;
+	iter = 100000000;
 
     for (int i = 0; i < comp.grid_w * comp.grid_h; i++) {
         comp.grid[i] = 0;
@@ -351,9 +364,9 @@ bool comp_chaos(void)
 	seedX = 0;
 	seedY = 0;
 
-    int color[] = {0,1,2,3,4,5};
-    int col_shift = rand() % 6;
-    int col_ind = 1;
+    int color[] = {1,2,3,4,5,6,7,8};
+    int col_shift = rand() % 8;
+    int col_ind = 0;
  
 	for(i=0;i<iter;i++){
 		choice = rand()%fr_data.ch_d.verticles;
@@ -361,11 +374,11 @@ bool comp_chaos(void)
 		seedX = (seedX + vertices[choice][0])/fr_data.ch_d.mod + comp.grid_w*fr_data.ch_d.shift;
 		seedY = (seedY + vertices[choice][1])/fr_data.ch_d.mod + comp.grid_h*fr_data.ch_d.shift;
 
-        col_ind = (choice) % 6;
+        col_ind = (col_shift + choice) % 8;
 		comp.grid[(int)(seedX +  comp.grid_w * seedY)] = color[col_ind];
         if (i%5000000 == 0) {
             col_shift += 1;
-            fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Sierpenski chaos is being calculated - progress = %d%%\r", i*100/200000000);
+            fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Sierpenski chaos is being calculated - progress = %d%%\r", i*100/100000000);
             gui_refresh();
         }
 	}

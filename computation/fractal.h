@@ -15,9 +15,10 @@ typedef enum {
 } chaos_presets;
 
 typedef enum {
-    JULIAN_AND_MANDELBROT,
-    BARNSLEY,
+    JULIA,
+    MANDELBROT_FR,
     CHAOS,
+    BARNSLEY,
     FRACTAL_TYPE_NUM
 } fractal_t;
 
