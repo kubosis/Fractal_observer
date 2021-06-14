@@ -16,6 +16,7 @@
 #include "../utils/utils.h"
 #include "../gui_win/gui.h"
 #include "../computation/computation.h"
+#include "../computation/fractal.h"
 #include "../gui_win/xwin_sdl.h"
 #include "../gui_win/guithreads.h"
 #include "../io_handle/prg_serial_nonblock.h"
@@ -24,10 +25,14 @@
 #define INCREASE true
 #define DECREASE false
 
+const char *fractal_names[] = {"Julia set 2","Julia set 3","Julia set 4","Julia set 5","Julia set 6","Julia set 7", "Mandelbrot",
+                               "Multibrot 3", "Multibrot 4", "Multibrot 5", "Multibrot 6", "Multibrot 7","Sierpenski chaos", "Barnsley fern", };
+
 int baud_level = RATE_NORMAL;
 bool animate;
 bool abort_req = false; // abort requested
 bool comp_set = false;
+int fractal_type = JULIA_2;
 
 bool handle_keyboard(event *ev, message *msg, bool *drawn, data_t *data)
 {
@@ -112,6 +117,14 @@ bool handle_keyboard(event *ev, message *msg, bool *drawn, data_t *data)
             break;
         case EV_HELP:
             print_help();
+            break;
+        case EV_CHANGE_FRACTAL:
+            fractal_type += 1;
+            fractal_type %= FRACTAL_NUM;
+            set_fractal(fractal_type);
+            fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Fractal set to %s\n", fractal_names[fractal_type]);
+            cpu_compute();
+            gui_refresh();
             break;
         case EV_COMPUTE_CPU:
             // computes whole fractal on pc and displays it right away

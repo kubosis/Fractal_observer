@@ -106,7 +106,7 @@ void gui_resize_win(int w, int h, bool drawn)
 
 void change_img_size(int w, int h)
 {
-    gui.w = w;
+    gui.w = w - BUTTON_WIN_W;
     gui.h = h;
     xwin_resize(gui.w, gui.h);
     gui_refresh();

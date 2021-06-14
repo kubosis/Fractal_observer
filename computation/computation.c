@@ -7,17 +7,21 @@
 
 #include <math.h>
 #include <omp.h>
+#include <time.h>
 
 #include "computation.h"
 #include "../utils/utils.h"
 #include "../gui_win/gui.h"
 #include "../io_handle/iothreads.h"
+#include "fractal.h"
 
 #define ZOOM_INCREMENT 1.4
 #define ITERATIONS_INCREMENT 0.85
 #define COMPLEX_INCREMENT 0.01
 #define MOVE_INCREMENT -0.05
 #define ROUND_ERROR 0.000001
+
+#define M_PI 3.14159265358979323846
 
 static struct {
     double c_re;
@@ -28,6 +32,11 @@ static struct {
     double range_re_max;
     double range_im_min;
     double range_im_max;
+
+    double tmp_re_min;
+    double tmp_re_max;
+    double tmp_im_min;
+    double tmp_im_max;
 
     int grid_w;
     int grid_h;
@@ -71,10 +80,15 @@ static struct {
     .done = false,
 
     .chunk_id = 0,
+
 };
 
 void computation_init()
 {
+    set_fractal(JULIA_2);
+    presets_init();
+    fr = JULIAN_AND_MANDELBROT;
+    
     comp.grid = allocate_mem(comp.grid_w * comp.grid_h);
 
     comp.d_re = (comp.range_re_max - comp.range_re_min) / (1. * comp.grid_w);
@@ -206,17 +220,58 @@ void get_grid_size(int *w, int *h)
 void update_image(int w, int h, uint8_t *img)
 {
     int img_idx = 0;
+    int R,G,B;
+    int color[7][3] = {{255,0,0}, {0,255,0}, {0,0,255}, {255,255,0}, {255,0,255}, {0,255,255},  {0,125,255}};
+    // all basic colors with their complement
+    switch (fr) {
+        case JULIAN_AND_MANDELBROT:
+            for (int i = 0; i < w * h; ++i) {
+                int R, G, B;
+                const double t = 1. * comp.grid[i] / (comp.n);
+                R = 8.5 * (1-t)*t*t*t * 255;
+                G = 14 * (1-t)*(1-t)*t * t * 255;
+                B = 9 * (1-t)*(1-t)*(1-t) * t * 255;
+                img[img_idx++] = R <= 255 ? (R >= 0 ? R : 0) : 255;
+                img[img_idx++] = G <= 255 ? (G >= 0 ? G : 0) : 255;
+                img[img_idx++] = B <= 255 ? (B >= 0 ? B : 0) : 255;
 
-    for (int i = 0; i < w * h; ++i) {
-        int R, G, B;
-        const double t = 1. * comp.grid[i] / (comp.n + 1.0);
-        R = 8.5 * (1-t)*t*t*t * 255;
-        G = 14 * (1-t)*(1-t)*t * t * 255;
-        B = 9 * (1-t)*(1-t)*(1-t) * t * 255;
-        img[img_idx++] = R <= 255 ? (R >= 0 ? R : 0) : 255;
-        img[img_idx++] = G <= 255 ? (G >= 0 ? G : 0) : 255;
-        img[img_idx++] = B <= 255 ? (B >= 0 ? B : 0) : 255;
-
+            }
+            break;
+        case BARNSLEY:
+            for (int i = 0; i < w * h; ++i) {
+                img[img_idx++] = 0;
+                img[img_idx++] = comp.grid[i] == 255? 255 : 0;
+                img[img_idx++] = 0;
+            }
+            break;
+        case CHAOS:
+            for (int i = 0; i < w * h; ++i) {
+                if (comp.grid[i] == 0) {
+                    img[img_idx++] = 0;
+                    img[img_idx++] = 0;
+                    img[img_idx++] = 0;
+                } else {
+                    if (fr_data.ch_d.colors == COLORS) {
+                        R = color[comp.grid[i-1]][0];
+                        G = color[comp.grid[i-1]][1];
+                        B = color[comp.grid[i-1]][2];
+                    } else if (fr_data.ch_d.colors == CYAN) {
+                        R = 0;
+                        G = 255;
+                        B = 255;
+                    } else {
+                        R = rand()%255;
+                        G = rand()%255;
+                        B = rand()%255;
+                    }
+                    img[img_idx++] = R;
+                    img[img_idx++] = G;
+                    img[img_idx++] = B;
+                }
+            }
+            break;
+        default:
+            break;
     }
 }
 
@@ -239,13 +294,13 @@ void comp_grid_resize(int w, int h)
     computation_init();
 }
 
-bool cpu_compute()
+bool cpu_comp()
 {
     bool done = false;
     double re = comp.range_re_min;
     double im = comp.range_im_max;
     for (int i = 0; i < comp.grid_h * comp.grid_w; ++i) {
-        comp.grid[i] = fractal(re, im);
+        comp.grid[i] = fractal(re, im, comp.n, comp.c_re, comp.c_im);
         re += comp.d_re;
         if (re >= comp.range_re_max - ROUND_ERROR) {
             re = comp.range_re_min;
@@ -256,20 +311,95 @@ bool cpu_compute()
     return done;
 }
 
-
-uint8_t fractal(double re, double im)
+bool comp_barnsley()
 {
-    int iter;
-    for (iter = 1; iter <= comp.n; ++iter) {
-        double re_old = re;
-        re = re * re - im * im + comp.c_re;
-        im = 2*re_old*im + comp.c_im;
-        double z_abs = re*re + im * im;
-        if (z_abs > 4) {
-            break;
-        }
+
+    double x0=0,y0=0,x1,y1;
+    int diceThrow;
+    time_t t;
+    srand((unsigned)time(&t));
+
+    for (int i = 0; i < comp.grid_w * comp.grid_h; i++) {
+        comp.grid[i] = 0;
     }
-    return iter;
+
+    for (int i = 0; i < 500000000; ++i) {
+        diceThrow = rand()%100;
+
+        if(diceThrow==0) {
+            x1 = 0;
+            y1 = 0.16*y0;
+        }
+
+        else if(diceThrow>=1 && diceThrow<=7) {
+            x1 = 0.85*x0 +0.04*y0;
+            y1 = -0.04*x0 + 0.85 *y0 + 1.6;
+        }
+
+        else if(diceThrow>=8 && diceThrow<=15) {
+            x1 = 0.2*x0 - 0.26*y0;
+            y1 = 0.23*x0 + 0.22*y0 + 1.6;
+        }
+
+        else {
+            x1 = -0.15*x0 + 0.28*y0;
+            y1 = 0.26*x0 + 0.24*y0+0.44;
+        }
+
+
+        int grid_x = (int)(x1 / 4 * comp.grid_w + comp.grid_w / 2);
+        int grid_y = (int)(comp.grid_h - y1 / 10 * comp.grid_h) * comp.grid_w;
+        comp.grid[grid_x + grid_y] = 255;
+
+        x0 = x1;
+        y0 = y1;
+
+        if (i%250000 == 0) {
+            fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Barnsleyfern is being calculated - progress = %d%%\r", i*100/500000000);
+            gui_refresh();
+        }
+
+    }
+    fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " Barnsleyfern is being calculated - progress = %d%%\r\n", 100);
+    return true;
+}
+
+bool comp_chaos(void)
+{
+	time_t t;
+	int side, vertices[fr_data.ch_d.verticles][3],seedX,seedY;
+	int i,iter,choice;
+ 
+	side = comp.grid_w / fr_data.ch_d.ratio;
+ 
+	iter = 1000000;
+
+    for (int i = 0; i < comp.grid_w * comp.grid_h; i++) {
+        comp.grid[i] = 0;
+    }
+ 
+	for(i=0;i<fr_data.ch_d.verticles;i++){
+		vertices[i][0] = ((int)(comp.grid_w/2 + side*cos(i*2*M_PI/fr_data.ch_d.verticles)));
+		vertices[i][1] = ((int)(comp.grid_h/2 + side*sin(i*2*M_PI/fr_data.ch_d.verticles)));
+	}
+ 
+	srand((unsigned)time(&t));
+ 
+	seedX = 0;
+	seedY = 0;
+
+    int color[] = {1,2,3,4,5,6,7};
+ 
+	for(i=0;i<iter;i++){
+		choice = rand()%fr_data.ch_d.verticles;
+ 
+		seedX = (seedX + vertices[choice][0])/fr_data.ch_d.mod + comp.grid_w*fr_data.ch_d.shift;
+		seedY = (seedY + vertices[choice][1])/fr_data.ch_d.mod + comp.grid_h*fr_data.ch_d.shift;
+
+ 
+		comp.grid[(int)(seedX +  comp.grid_w * seedY)] = color[choice];
+	}
+    return true;
 }
 
 void set_init(int set)

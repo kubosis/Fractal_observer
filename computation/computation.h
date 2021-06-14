@@ -24,6 +24,24 @@
 #define SET_RANGE_IM 4
 #define SET_N 5
 
+enum {
+    JULIA_2,
+    JULIA_3,
+    JULIA_4,
+    JULIA_5,
+    JULIA_6,
+    JULIA_7,
+    MANDELBROT,
+    MULTIBROT_3,
+    MULTIBROT_4,
+    MULTIBROT_5,
+    MULTIBROT_6,
+    MULTIBROT_7,
+    CHAOS_GAME,
+    BARSNLEY_FERN,
+    FRACTAL_NUM
+};
+
 void computation_init();
 
 void computation_cleanup();
@@ -50,9 +68,12 @@ void comp_ended();
 
 void comp_grid_resize(int w, int h);
 
-bool cpu_compute();
+bool cpu_comp(void);
+bool comp_barnsley(void);
+bool comp_chaos(void);
+bool (*cpu_compute)(void);
 
-uint8_t fractal(double re, double im);
+uint16_t (*fractal)(double re, double im, int n, double c_re, double c_im);
 
 void set_init(int set);
 

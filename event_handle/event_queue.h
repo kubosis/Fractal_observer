@@ -44,6 +44,7 @@ typedef enum {
    EV_RESIZE,
    EV_SAVE_BLANK,
    EV_CHANGE_BAUD,
+   EV_CHANGE_FRACTAL,
    EV_TYPE_NUM,
 } event_type;
 

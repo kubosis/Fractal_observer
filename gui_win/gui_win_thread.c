@@ -163,6 +163,9 @@ bool gui_keyboard_ev(SDL_Event *sdl_ev, event *ev, bool *resize, bool *animate, 
             case SDLK_m:
                 ev->type = EV_ANIMATE;
                 break;
+            case SDLK_x:
+                ev->type = EV_CHANGE_FRACTAL;
+                break;
             case SDLK_o:
                 change_menu = true;
                 info("You have entered vaule change menu");

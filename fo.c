@@ -116,7 +116,6 @@ int main(int argc, char *argv[])
 
     help("Press 'h' to see help");
     help("or run with '--help' to see all options");
-
     computation_init();
     info("Computation initialized");
     gui_init();
@@ -128,7 +127,9 @@ int main(int argc, char *argv[])
 
     // main while cycle
     bool quit = false;
-
+    
+    
+    
     while (!quit) {
         ev = queue_pop();
         switch (ev.source) {
