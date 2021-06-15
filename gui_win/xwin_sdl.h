@@ -25,7 +25,6 @@ void xwin_close();
 void xwin_redraw(int w, int h, unsigned char *img);
 void xwin_poll_events(void);
 void xwin_resize(int width, int height);
-void save_image(char *scr_name);
 void xwin_redraw_button(int button, bool anim, bool anim_change);
 
 #endif

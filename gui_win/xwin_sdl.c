@@ -155,15 +155,6 @@ void xwin_resize(int width, int height)
    SDL_SetWindowSize(win, width + BUTTON_WIN_W, height);
 }
 
-void save_image(char *scr_name)
-{
-   IMG_Init(IMG_INIT_PNG);
-   SDL_Surface *scr = SDL_GetWindowSurface(win);
-   IMG_SavePNG(scr, scr_name);
-   SDL_FreeSurface(scr);
-   IMG_Quit();
-}
-
 void xwin_redraw_button(int button, bool anim, bool anim_change) {
    animation = anim;
    SDL_Surface *scr = SDL_GetWindowSurface(win);

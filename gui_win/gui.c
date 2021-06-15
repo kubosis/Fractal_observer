@@ -12,6 +12,7 @@
 #include "../computation/computation.h"
 #include "gui.h"
 #include "../utils/utils.h"
+#include "save_image.h"
 
 
 /* definition of gui window sizes */
@@ -112,3 +113,7 @@ void change_img_size(int w, int h)
     gui_refresh();
 }
 
+void req_save_image(char *name)
+{
+    save_image(gui.img, gui.w, gui.h, name);
+}

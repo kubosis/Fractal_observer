@@ -18,8 +18,8 @@
 
 #define POLL_EVENT_CALL 1000
 
-#define ANIMATIONS_LIMIT 70
-#define ANIMATIONS_OFFSET 0.0125
+#define ANIMATIONS_LIMIT 650
+#define ANIMATIONS_OFFSET 0.001
 
 void *animation_thread(void *v)
 {

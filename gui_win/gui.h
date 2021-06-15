@@ -51,4 +51,6 @@ void gui_resize_win(int w, int h, bool drawn);
 /* change sizes of image for computation */
 void change_img_size(int w, int h);
 
+void req_save_image(char *name);
+
 #endif

@@ -168,12 +168,11 @@ bool handle_keyboard(event *ev, message *msg, bool *drawn, data_t *data)
             if (*drawn || is_computing() || save_blank) {
                 current_time = time(&current_time);
                 struct tm * time_info = localtime(&current_time);
-                char time_string[9];
-                strftime(time_string, sizeof(time_string), "%H:%M:%S", time_info);
-                char scr_name[] = {'S', 'C', 'R', 'E', 'E', 'N', 'S', 'H', 'O', 'T',
-                    '_', time_string[0], time_string[1], '_', time_string[3], time_string[4],
-                    '_', time_string[6], time_string[7], '.', 'P', 'N', 'G', '\0'};
-                save_image(scr_name);
+                char time_string[60];
+                strftime(time_string, sizeof(time_string), "%d_%m_%H_%M_%S", time_info);
+                char scr_name[75] = "SCREENSHOT";
+                strcat(scr_name, time_string);
+                req_save_image(scr_name);
                 fprintf(stderr, ANSI_INFO "INFO: " ANSI_RESET " %s was generated\n", scr_name);
                 save_blank = false;
             }
